@@ -26,7 +26,7 @@ class ControllerInformationContact extends Controller {
 
 //-----------------------------------------------------------------------------------------------------------------
         $this->document->setTitle($this->language->get('heading_title'));
-
+       // print_r($this->request);
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			$mail = new Mail($this->config->get('config_mail_engine'));
 			$mail->parameter = $this->config->get('config_mail_parameter');
@@ -40,12 +40,12 @@ class ControllerInformationContact extends Controller {
 			$mail->setFrom($this->config->get('config_email')); //от
 			$mail->setReplyTo($this->request->post['email']);
 			$mail->setSender($this->request->post['email']);
-			$mail->setSubject(html_entity_decode($sMyStr));
-			$mail->setText (strlen($_POST['enquiry']));
+            $mail->setSubject('Имя: '. html_entity_decode($sMyStr));
+            $mail->setText ('От пользователя с e-mail: '.$this->request->post['email'] . " \nСообщение: " . mb_strlen($_POST['enquiry']));
 
 
 			// отправка файлов
-            if(isset($this->request->post['file'])){
+            if(!empty($this->request->post['file'])){
                 $arExplodedFiles = explode(",",  $this->request->post['file']);
                 foreach ($arExplodedFiles as $arExplodedFile){
                     $mail->addAttachment(DIR_UPLOAD.$arExplodedFile);
@@ -84,6 +84,12 @@ class ControllerInformationContact extends Controller {
 			$data['error_enquiry'] = $this->error['enquiry'];
 		} else {
 			$data['error_enquiry'] = '';
+		}
+
+		if (isset($this->error['file'])) {
+			$data['error_file'] = $this->error['file'];
+		} else {
+			$data['error_file'] = '';
 		}
 
 		$data['button_submit'] = $this->language->get('button_submit');
@@ -266,6 +272,10 @@ class ControllerInformationContact extends Controller {
 		if ((utf8_strlen($this->request->post['enquiry']) < 10) || (utf8_strlen($this->request->post['enquiry']) > 3000)) {
 			$this->error['enquiry'] = $this->language->get('error_enquiry');
 		}
+
+        if ((empty($this->request->post['file']))) {
+            $this->error['file'] = $this->language->get('error_file');
+        }
 
 		// Captcha
 		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {

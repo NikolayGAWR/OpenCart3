@@ -137,8 +137,11 @@
               <button type="button" id="button-upload" data-loading-text="{{ text_loading }}" class="btn btn-default btn-block">
                 {{ text_upload_file }}
               </button>
-              <input type="hidden" name="file" id="file">
+              <input type="hidden" name="file" id="file" required>
               <span class="success"></span>
+              {% if error_file %}
+                <div class="text-danger">{{ error_file }}</div>
+              {% endif %}
             </div>
           </div>
 {#--------------------------------------#}
@@ -154,11 +157,6 @@
     {{ column_right }}</div>
 </div>
 {{ footer }}
-
-
-
-
-
 
 <script type="text/javascript">
 
